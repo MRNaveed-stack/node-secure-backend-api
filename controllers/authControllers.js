@@ -216,32 +216,38 @@ exports.resetPassword = async(req,res) => {
 
 }
 
-exports.verifyEmail = async(req, res) => {
-    try {
-        const {token} = req.query;
-    if (!token) {
-        return res.status(400).json({msg : "Verification token required"});
-    }
-    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-    const user = await User.findOne({
-        emailVerificationToken: hashedToken,
-        emailVerificationExpires: {$gt : Date.now()}
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.query;
 
-    });
-    if (!user) {
-        return res.status(400).json({msg : "invalid or expired token"});
+    if (!token) {
+      return res.status(400).json({ msg: "Verification token required" });
     }
+
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      emailVerificationToken: hashedToken,
+      emailVerificationExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ msg: "Invalid or expired token" });
+    }
+
     user.isVerified = true;
-    user.emailVerificationToken = null,
-    user.emailVerificationExpires = null,
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpires = undefined;
+
     await user.save();
 
-   res.json({msg : 'Email verified successfully! You can now login'})
-    
-    } catch (error) {
-        console.log('Verification error: ', error);
-        res.status(500).json({msg: 'server error'});
-    }
+    res.json({ msg: "Email verified successfully! You can now login." });
 
-
-}
+  } catch (error) {
+    console.error("Verification error:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
+};
