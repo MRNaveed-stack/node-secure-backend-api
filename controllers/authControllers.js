@@ -3,7 +3,6 @@ const User = require('../models/User');
 const {generateAccessToken, generateRefreshToken} = require('../utils/jwt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
 const { sendPasswordResetEmail, sendVerificationEmail } = require('../utils/email');
 
 
@@ -243,5 +242,6 @@ exports.verifyEmail = async(req, res) => {
         console.log('Verification error: ', error);
         res.status(500).json({msg: 'server error'});
     }
+
 
 }
